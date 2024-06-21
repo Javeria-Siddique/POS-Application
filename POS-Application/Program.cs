@@ -9,6 +9,7 @@ namespace POSApp
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(AppMgmt.hello);
             Console.WriteLine("Application working so far");
             string x = Console.ReadLine();
         }
