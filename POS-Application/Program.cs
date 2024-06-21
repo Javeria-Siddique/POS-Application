@@ -13,29 +13,28 @@ namespace POSApp
         {
             Console.WriteLine("Application starting");
             AppMgmt.AddRandomUsers();
-            Console.WriteLine("Users added");
+            AppMgmt.AddRandomProducts();
+            option1:
             Console.WriteLine("Choose the action:\n1. Login Admin 2. Login Cashier");
             string login = Console.ReadLine();
             if (login != null)
             {
                 if (int.Parse(login) == 1)
                 {
+                    wrongPassword:
                     Console.WriteLine("Enter Password");
                     string pass = Console.ReadLine();
                     if (pass != null) {
                         user = AppMgmt.AuthenticateUser(1, pass);
-                        if (user != null)
+                        if (user == null)
                         {
-                            Console.WriteLine($"user: {user.name}");
-                        }
-                        else
-                        {
-                            return;
+                            goto wrongPassword;
                         }
                     }
                 }
                 else if (int.Parse(login) == 2)
                 {
+                    wrongCredentials:
                     Console.WriteLine("Enter ID: ");
                     string id = Console.ReadLine();
                     Console.WriteLine("Enter password: ");
@@ -43,21 +42,34 @@ namespace POSApp
                     if (pass != null)
                     {
                         user = AppMgmt.AuthenticateUser(int.Parse(id), pass, "cashier");
-                        if (user != null)
+                        if (user == null)
                         {
-                            Console.WriteLine($"user: {user.name}");
-                        }
-                        else
-                        {
-                            return;
+                            goto wrongCredentials;
                         }
                     }
                 }
                 else
                 {
                     Console.WriteLine("Invalid option");
-                    return;
+                    goto option1;
                 }
+                option2:
+                Console.WriteLine("Choose the action: \n");
+                AppMgmt.DisplayMenu();
+                string action = Console.ReadLine();
+                if (action != null)
+                {
+                    AppMgmt.PerformAction(int.Parse(action));
+                }
+                else
+                {
+                    goto option2;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid option");
+                goto option1;
             }
             string x = Console.ReadLine();
         }
