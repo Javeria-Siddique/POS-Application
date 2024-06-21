@@ -73,7 +73,7 @@ namespace POSApp
         }
         public static void CashierMenu()
         {
-            Console.WriteLine("1. Check product info\t2. Add product to sale\n");
+            Console.WriteLine("1. Check product info\t2. Add product to sale\n3. Generate Receipt");
         }
         public static void DisplayMenu()
         {
@@ -98,7 +98,7 @@ namespace POSApp
         {
             if (role == "cashier")
             {
-                if (option < 1 && option > 2)
+                if (option < 1 && option > 3)
                 {
                     return;
                 }
@@ -111,6 +111,10 @@ namespace POSApp
                     if (option == 2)
                     {
                         //add product to sale transaction
+                    }
+                    if (option == 3)
+                    {
+                        //generate receipt
                     }
                 }
             }
