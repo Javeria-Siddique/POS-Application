@@ -5,11 +5,12 @@ using POSApp.Data;
 
 namespace POSApp
 {
-    public class AppMgmt
+    public static class AppMgmt
     {
-        private readonly AppDBContext context = new AppDBContext();
+        private static readonly AppDBContext context = new AppDBContext();
+        public static string hello = "hello";
 
-        public void AuthenticateUser(int id, string password, string role = "admin")
+        public static void AuthenticateUser(int id, string password, string role = "admin")
         {
             var user = context.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
@@ -28,5 +29,3 @@ namespace POSApp
         }
     }
 }
-
-
