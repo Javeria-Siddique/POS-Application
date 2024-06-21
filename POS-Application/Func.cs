@@ -11,6 +11,8 @@ namespace POSApp
         private static readonly AppDBContext context = new AppDBContext();
         public static string hello = "hello";
         public static string role = "admin";
+        public static int ID;
+        public static int sales = 1;
 
         public static User AuthenticateUser(int id, string password, string userRole = "admin")
         {
@@ -24,6 +26,7 @@ namespace POSApp
                 if (BCrypt.Net.BCrypt.Verify(password, user.password))
                 {
                     Console.WriteLine("User authenticated");
+                    ID = id;
                     return user;
                 }
                 else
@@ -111,6 +114,7 @@ namespace POSApp
                     if (option == 2)
                     {
                         //add product to sale transaction
+                        //check sales id in DbSet, if it exists append the product to its Items variable, otherwise create new obj and add in Items
                     }
                     if (option == 3)
                     {
