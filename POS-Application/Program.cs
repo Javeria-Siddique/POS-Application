@@ -60,6 +60,7 @@ namespace POSApp
                 if (action != null)
                 {
                     AppMgmt.PerformAction(int.Parse(action));
+                    goto option2;
                 }
                 else
                 {

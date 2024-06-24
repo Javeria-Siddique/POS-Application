@@ -9,10 +9,11 @@ namespace POSApp
     public static class AppMgmt
     {
         private static readonly AppDBContext context = new AppDBContext();
-        public static string hello = "hello";
         public static string role = "admin";
         public static int ID;
-        public static int sales = 1;
+        private static int usersCount = 1;
+        private static int productsCount = 1;
+        private static int salesCount = 1;
 
         public static User AuthenticateUser(int id, string password, string userRole = "admin")
         {
@@ -39,40 +40,49 @@ namespace POSApp
         }
         public static void AddRandomUsers()
         {
-            var user1 = new User(1, "admin", "admin@gmail.com", "adminPassword", "admin");
+            var user1 = new User(usersCount, "admin", "admin@gmail.com", "adminPassword", "admin");
+            usersCount++;
             context.Users.Add(user1);
             context.SaveChanges();
-            var user2 = new User(2, "cashier1", "cashier1@gmail.com", "cashier1Password", "cashier");
+            var user2 = new User(usersCount, "cashier1", "cashier1@gmail.com", "cashier1Password", "cashier");
+            usersCount++;
             context.Users.Add(user2);
             context.SaveChanges();
-            var user3 = new User(3, "cashier2", "cashier2@gmail.com", "cashier2Password", "cashier");
+            var user3 = new User(usersCount, "cashier2", "cashier2@gmail.com", "cashier2Password", "cashier");
+            usersCount++;
             context.Users.Add(user3);
             context.SaveChanges();
-            var user4 = new User(4, "cashier3", "cashier3@gmail.com", "cashier3Password", "cashier");
+            var user4 = new User(usersCount, "cashier3", "cashier3@gmail.com", "cashier3Password", "cashier");
+            usersCount++;
             context.Users.Add(user4);
             context.SaveChanges();
-        }
+        } 
         public static void AddRandomProducts()
         {
-            var product1 = new Product(1, "Product1", 100, 10, "abc", "xyz");
+            var product1 = new Product(productsCount, "Product1", 100, 10, "abc", "xyz");
+            productsCount++;
             context.Products.Add(product1);
             context.SaveChanges();
-            var product2 = new Product(2, "Product2", 100, 10, "abc", "xyz");
+            var product2 = new Product(productsCount, "Product2", 100, 10, "abc", "xyz");
+            productsCount++;
             context.Products.Add(product2);
             context.SaveChanges();
-            var product3 = new Product(3, "Product3", 100, 10, "abc", "xyz");
+            var product3 = new Product(productsCount, "Product3", 100, 10, "abc", "xyz");
+            productsCount++;
             context.Products.Add(product3);
             context.SaveChanges();
-            var product4 = new Product(4, "Product4", 100, 10, "abc", "xyz");
+            var product4 = new Product(productsCount, "Product4", 100, 10, "abc", "xyz");
+            productsCount++;
             context.Products.Add(product4);
             context.SaveChanges();
-            var product5 = new Product(5, "Product5", 100, 10, "abc", "xyz");
+            var product5 = new Product(productsCount, "Product5", 100, 10, "abc", "xyz");
+            productsCount++;
             context.Products.Add(product5);
             context.SaveChanges();
         }
         public static void AdminMenu()
         {
-            Console.WriteLine("1. Register new Cashier\t2. Add new Product\t3. Remove Product\t4. Update Product\t5. Check Inventory\t6. Check Transactions\n");
+            Console.WriteLine("1. Register new Cashier\t2. Add new Product\t3. Remove Product\t4. Update Product\t5. Check Inventory\t6. Check Sales\n");
         }
         public static void CashierMenu()
         {
@@ -89,13 +99,114 @@ namespace POSApp
                 CashierMenu();
             }
         }
-        public static Product CheckProductInfo()
+        public static Product CheckProductInfo(bool check = true)
         {
             Console.WriteLine("Enter Product ID: ");
             string productId = Console.ReadLine();
             Product product = context.Products.FirstOrDefault(product => product.Id == int.Parse(productId));
-            Console.WriteLine($"------Product Info------\nId\tName\t\tPrice\tQuantity\tType\tCategory\n{product.Id}\t{product.name}\t{product.price}\t{product.quantity}\t\t{product.type}\t{product.category}");
+            if (check)
+            {
+                Console.WriteLine($"------Product Info------\nId\tName\t\tPrice\tQuantity\tType\tCategory\n{product.Id}\t{product.name}\t{product.price}\t{product.quantity}\t\t{product.type}\t{product.category}");
+            }
             return product;
+        }
+        public static void RegisterNewCashier()
+        {
+            Console.WriteLine("Enter cashier's name: ");
+            string name = Console.ReadLine();
+            Console.WriteLine("Enter cashier's email: ");
+            string email = Console.ReadLine();
+            Console.WriteLine("Enter cashier's password: ");
+            string password = Console.ReadLine();
+            var user = new User(usersCount, name, email, password, "cashier");
+            usersCount++;
+            context.Users.Add(user);
+            context.SaveChanges();
+            Console.WriteLine("Cashier Added successfully");
+        }
+        public static void AddNewProduct()
+        {
+            Console.WriteLine("Enter product name: ");
+            string name = Console.ReadLine();
+            Console.WriteLine("Enter product price: ");
+            string price = Console.ReadLine();
+            Console.WriteLine("Enter product quantity: ");
+            string quantity = Console.ReadLine();
+            Console.WriteLine("Enter product's type: ");
+            string type = Console.ReadLine();
+            Console.WriteLine("Enter product's category: ");
+            string category = Console.ReadLine();
+            var product = new Product(productsCount, name, Convert.ToDecimal(price), int.Parse(quantity), type, category);
+            productsCount++;
+            context.Products.Add(product);
+            context.SaveChanges();
+            Console.WriteLine("Product Added successfully");
+        }
+        public static void RemoveProduct()
+        {
+            var product = CheckProductInfo(false);
+            context.Products.Remove(product);
+            context.SaveChanges();
+            Console.WriteLine("Product removed");
+        }
+        public static void UpdateProduct()
+        {
+            var product = CheckProductInfo();
+            Console.WriteLine("Enter new price (enter - if you want to keep it same): ");
+            string price = Console.ReadLine();
+            if (price != "-")
+            {
+                product.price = Convert.ToDecimal(price);
+            }
+            Console.WriteLine("Enter new quantity (enter - if you want to keep it same): ");
+            string quantity = Console.ReadLine();
+            if (quantity != "-")
+            {
+                product.quantity = int.Parse(quantity);
+            }
+            Console.WriteLine("Enter new type (enter - if you want to keep it same): ");
+            string type = Console.ReadLine();
+            if (type != "-")
+            {
+                product.type = type;
+            }
+            Console.WriteLine("Enter new category (enter - if you want to keep it same): ");
+            string category = Console.ReadLine();
+            if (category != "-")
+            {
+                product.category = category;
+            }
+            Console.WriteLine("Product updated!");
+        }
+        public static void CheckInventory()
+        {
+            Console.WriteLine($"------Inventory------\nId\tName\t\tPrice\tQuantity\tType\tCategory\n");
+            for (int i = 0; i < productsCount; i++)
+            {
+                Product product = context.Products.FirstOrDefault(product => product.Id == i);
+                if (product != null) 
+                {
+                    Console.WriteLine($"{product.Id}\t{product.name}\t{product.price}\t{product.quantity}\t\t{product.type}\t{product.category}");
+                }
+            }
+            Console.WriteLine("\n\n");
+        }
+        public static void CheckSales()
+        {
+            Console.WriteLine("------Sales------");
+            for (int i = 0; i < salesCount; i++)
+            {
+                var sale = context.Sales.FirstOrDefault(s => s.Id == i);
+                if (sale != null)
+                {
+                    Console.WriteLine("Cashier ID: ", sale.cashierId);
+                    Console.WriteLine("ID\tName\tQuantity\tPrice");
+                    for (int j=0; j< sale.Items.Count; j++)
+                    {
+                        Console.WriteLine($"{sale.Items[j].productId}\t{sale.Items[j].productName}\t{sale.Items[j].quantity}\t{sale.Items[j].price}");
+                    }
+                }
+            }
         }
         public static void PerformAction(int option)
         {
@@ -132,27 +243,27 @@ namespace POSApp
                 {
                     if (option == 1)
                     {
-                        // register new cashier
+                        RegisterNewCashier();
                     }
                     if (option == 2)
                     {
-                        //add new product
+                        AddNewProduct();
                     }
                     if (option == 3)
                     {
-                        //remove product
+                        RemoveProduct();
                     }
                     if (option == 4)
                     {
-                        //update product
+                        UpdateProduct();
                     }
                     if (option == 5)
                     {
-                        //check inventory
+                        CheckInventory();
                     }
                     if (option == 6)
                     {
-                        //check transactions
+                        CheckSales();
                     }
                 }
             }
