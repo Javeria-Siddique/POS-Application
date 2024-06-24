@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using POSApp.Entities;
 using POSApp.Data;
 using System.Security.Principal;
+using System.ComponentModel.Design;
 
 namespace POSApp
 {
@@ -14,6 +15,7 @@ namespace POSApp
         private static int usersCount = 1;
         private static int productsCount = 1;
         private static int salesCount = 1;
+        private static int productsSalesCount = 1;
 
         public static User AuthenticateUser(int id, string password, string userRole = "admin")
         {
@@ -189,7 +191,7 @@ namespace POSApp
                     Console.WriteLine($"{product.Id}\t{product.name}\t{product.price}\t{product.quantity}\t\t{product.type}\t{product.category}");
                 }
             }
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
         }
         public static void CheckSales()
         {
@@ -208,6 +210,66 @@ namespace POSApp
                 }
             }
         }
+        public static void AddProductToSale()
+        {
+            CheckInventory();
+            addProducts:
+            var product = CheckProductInfo(false);
+            Console.WriteLine("Enter quantity: ");
+            string quantity = Console.ReadLine();
+            if (int.Parse(quantity) > product.quantity)
+            {
+                Console.WriteLine($"Not enough products available. Adding {product.quantity} items in cart");
+                quantity = product.quantity.ToString();
+            }
+            var purchase = new Purchase(productsSalesCount, product.Id, product.name, int.Parse(quantity), product.price * int.Parse(quantity));
+            productsSalesCount++;
+            product.quantity -= int.Parse(quantity);
+            var sale = context.Sales.FirstOrDefault(s => s.Id == salesCount);
+            if (sale == null)
+            {
+                sale = new Sale(salesCount, ID);
+                sale.Items.Add(purchase);
+                context.Sales.Add(sale);
+                context.SaveChanges();
+                Console.WriteLine("Product added in sale!");
+            }
+            else
+            {
+                sale.Items.Add(purchase);
+                Console.WriteLine("Product added in sale!");
+            }
+            Console.WriteLine("Enter 1 if you want to add more products to current sale, otherwise enter 0: ");
+            string cont = Console.ReadLine();
+            if (cont == "1")
+            {
+                goto addProducts;
+            }
+            else
+            {
+                return;
+            }
+        }
+        public static void GenerateReceipt()
+        {
+            var sale = context.Sales.FirstOrDefault(s => s.Id == salesCount);
+            if (sale == null)
+            {
+                Console.WriteLine("No purchase in this sale so far");
+            }
+            else
+            {
+                decimal totalBill = 0;
+                Console.WriteLine("sr.\tID: Name\tQuantity\tPrice");
+                for (int i = 0; i < sale.Items.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}\t{sale.Items[i].productId}:{sale.Items[i].productName}\t{sale.Items[i].quantity}\t\t{sale.Items[i].price}");
+                    totalBill += sale.Items[i].price;
+                }
+                Console.WriteLine($"Total Bill: \t\t\t{totalBill}");
+                salesCount++;
+            }
+        }
         public static void PerformAction(int option)
         {
             if (role == "cashier")
@@ -224,12 +286,11 @@ namespace POSApp
                     }
                     if (option == 2)
                     {
-                        //add product to sale transaction
-                        //check sales id in DbSet, if it exists append the product to its Items variable, otherwise create new obj and add in Items
+                        AddProductToSale();
                     }
                     if (option == 3)
                     {
-                        //generate receipt
+                        GenerateReceipt();
                     }
                 }
             }
